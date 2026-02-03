@@ -18,6 +18,7 @@ function toggleTheme() {
     }
 }
 
+var inverseMode = false;
 var currentExpression = '';
 
 var currencyRates = {
@@ -253,17 +254,24 @@ function calculateResult() {
     if (currentExpression.length === 0) return;
 
     try {
-        let result = eval(currentExpression);
+        const safeExpression = normalizeExpression(currentExpression);
+
+        let result = eval(safeExpression);
+
         if (isNaN(result) || !isFinite(result)) {
             result = 'Error';
         }
+
         currentExpression = result.toString();
         updateResult();
+        document.getElementById('word-result').innerHTML = numberToWords(result);
+
     } catch (e) {
         currentExpression = 'Error';
         updateResult();
     }
 }
+
 
 function applyLogarithm() {
   if (left.length === 0) return;
@@ -285,142 +293,40 @@ function applyLogarithm() {
   updateResult();
 }
 
-function toRadians(deg) {
-    return deg * (Math.PI / 180);
-}
+function toggleInverseMode() { inverseMode = !inverseMode; document.getElementById('sin-btn').textContent = inverseMode ? 'sin⁻¹' : 'sin'; document.getElementById('cos-btn').textContent = inverseMode ? 'cos⁻¹' : 'cos'; document.getElementById('tan-btn').textContent = inverseMode ? 'tan⁻¹' : 'tan'; document.getElementById('inv-btn').classList.toggle('active', inverseMode); }
 
-function toDegrees(rad) {
-    return rad * (180 / Math.PI);
-}
+function sinDeg(x) { return Math.sin(x * Math.PI / 180); }
+function cosDeg(x) { return Math.cos(x * Math.PI / 180); }
+function tanDeg(x) { return Math.tan(x * Math.PI / 180); }
 
+function asinDeg(x) { return Math.asin(x) * 180 / Math.PI; }
+function acosDeg(x) { return Math.acos(x) * 180 / Math.PI; }
+function atanDeg(x) { return Math.atan(x) * 180 / Math.PI; }
 
-function applyTrig(func, value) {
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-        alert('Invalid input');
-        return null;
-    }
-
-    switch (func) {
-        case 'sin':
-            return Math.sin(toRadians(num));
-        case 'cos':
-            return Math.cos(toRadians(num));
-        case 'tan':
-            return Math.tan(toRadians(num));
-        default:
-            return null;
-    }
-}
-
-
-function trigToResult(func) {
-    let target = operator.length === 0 ? left : right;
-
-    if (!target.length) {
-        alert('Enter a number first');
-        return;
-    }
-
-    const result = applyTrig(func, target);
-    if (result === null) return;
-
-    if (operator.length === 0) {
-        left = result.toString();
-    } else {
-        right = result.toString();
-    }
-
-    if(steps.length < MAX_STEPS) {
-        steps.push(`Step ${steps.length + 1}: ${func}(${target}) = ${result}`);
-    }
-
+function appendTrig(func) {
+    currentExpression += func + '(';
     updateResult();
-    updateStepsDisplay();
-    document.getElementById('word-result').innerHTML = numberToWords(result);
 }
 
-function applyInverseTrig(func, value) {
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-        alert('Invalid input');
-        return null;
-    }
-
-    switch (func) {
-        case 'asin':
-            if (num < -1 || num > 1) {
-                alert('asin input must be between -1 and 1');
-                return null;
-            }
-            return toDegrees(Math.asin(num));
-
-        case 'acos':
-            if (num < -1 || num > 1) {
-                alert('acos input must be between -1 and 1');
-                return null;
-            }
-            return toDegrees(Math.acos(num));
-
-        case 'atan':
-            return toDegrees(Math.atan(num));
-
-        default:
-            return null;
-    }
-}
-
-function inverseTrigToResult(func) {
-    const map = {
-        sin: 'asin',
-        cos: 'acos',
-        tan: 'atan'
-    };
-
-    let target = operator.length === 0 ? left : right;
-
-    if (!target.length) {
-        alert('Enter a number first');
-        return;
-    }
-
-    const result = applyInverseTrig(map[func], target);
-    if (result === null) return;
-
-    if (operator.length === 0) {
-        left = result.toString();
-    } else {
-        right = result.toString();
-    }
-
-    if(steps.length < MAX_STEPS) {
-        steps.push(`Step ${steps.length + 1}: ${func}(${target}) = ${result}`);
-    }
-
-    updateResult();
-    updateStepsDisplay();
-    document.getElementById('word-result').innerHTML = numberToWords(result);
-}
-
-
-
-function toggleInverseMode() {
-    inverseMode = !inverseMode;
-
-    document.getElementById('sin-btn').textContent = inverseMode ? 'sin⁻¹' : 'sin';
-    document.getElementById('cos-btn').textContent = inverseMode ? 'cos⁻¹' : 'cos';
-    document.getElementById('tan-btn').textContent = inverseMode ? 'tan⁻¹' : 'tan';
-
-    document.getElementById('inv-btn').classList.toggle('active', inverseMode);
-}
 
 function trigButtonPressed(func) {
-    if (inverseMode) {
-        inverseTrigToResult(func);
-    } else {
-        trigToResult(func);
-    }
+    const map = inverseMode
+        ? { sin: 'asin', cos: 'acos', tan: 'atan' }
+        : { sin: 'sin',  cos: 'cos',  tan: 'tan' };
+
+    appendTrig(map[func]);
 }
+
+function normalizeExpression(expr) {
+    return expr
+        .replace(/asin\(/g, 'asinDeg(')
+        .replace(/acos\(/g, 'acosDeg(')
+        .replace(/atan\(/g, 'atanDeg(')
+        .replace(/sin\(/g, 'sinDeg(')
+        .replace(/cos\(/g, 'cosDeg(')
+        .replace(/tan\(/g, 'tanDeg(');
+}
+
 
 function isPrime(num) {
   // Numbers less than 2 are not prime
@@ -741,22 +647,22 @@ document.addEventListener('keydown', function(event) {
     } else if (key === '.') {
         appendToResult(key);
     }else if (key === 's') {
-        trigToResult('sin');
+        trigButtonPressed('sin');
     } else if (key === 'c') {
-        trigToResult('cos');
+        trigButtonPressed('cos');
     } else if (key === 't') {
-        trigToResult('tan');
+        trigButtonPressed('tan');
     }
     else if (key === 'i') {
         toggleInverseMode();
     }
     else if (key === 'A') {
-        inverseTrigToResult('sin');
+        trigButtonPressed('sin');
     }
     else if (key === 'C') {
-        inverseTrigToResult('cos');
+        trigButtonPressed('cos');
     }
     else if (key === 'T') {
-        inverseTrigToResult('tan');
+        trigButtonPressed('tan');
     }
 });
