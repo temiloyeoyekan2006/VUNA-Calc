@@ -583,3 +583,93 @@ function normalizeSpeech(text) {
     .split(" ")
     .filter(t => t.trim() !== "");
 }
+
+let scientificMode = false;
+
+// Toggle Scientific Mode
+function toggleScientific() {
+    scientificMode = !scientificMode;
+    const scientificBtns = document.querySelectorAll('.scientific-btn');
+    const toggle = document.getElementById('science-toggle');
+    
+    scientificBtns.forEach(btn => {
+        btn.classList.toggle('show');
+    });
+    
+    toggle.textContent = scientificMode ? '🧮 Scientific Mode: ON' : '🧮 Scientific Mode';
+    toggle.classList.toggle('active', scientificMode);
+}
+
+// FIXED FUNCTIONS - Now use currentExpression instead of left/right/operator
+function tangent() {
+    if (!currentExpression || currentExpression === 'Error') {
+        alert('Please enter a number first');
+        return;
+    }
+    
+    try {
+        const num = eval(currentExpression);
+        if (isNaN(num) || !isFinite(num)) {
+            currentExpression = 'Error';
+        } else {
+            currentExpression = Math.tan(num * Math.PI / 180).toFixed(6).toString();
+        }
+    } catch (e) {
+        currentExpression = 'Error';
+    }
+    updateResult();
+}
+
+function factorial() {
+    if (!currentExpression || currentExpression === 'Error') {
+        alert('Please enter a positive whole number first');
+        return;
+    }
+    
+    try {
+        const num = eval(currentExpression);
+        const intNum = parseInt(num);
+        
+        if (isNaN(intNum) || !Number.isInteger(num) || intNum < 0) {
+            alert('Factorial only works with non-negative whole numbers');
+            return;
+        }
+        
+        if (intNum > 170) {
+            alert('Number too large for factorial calculation');
+            return;
+        }
+        
+        let result = 1;
+        for (let i = 2; i <= intNum; i++) {
+            result *= i;
+        }
+        
+        currentExpression = result.toString();
+    } catch (e) {
+        currentExpression = 'Error';
+    }
+    updateResult();
+}
+
+function logarithm() {
+    if (!currentExpression || currentExpression === 'Error') {
+        alert('Please enter a positive number first');
+        return;
+    }
+    
+    try {
+        const num = eval(currentExpression);
+        if (isNaN(num) || !isFinite(num)) {
+            currentExpression = 'Error';
+        } else if (num <= 0) {
+            alert('Logarithm only works with positive numbers');
+            return;
+        } else {
+            currentExpression = Math.log10(num).toFixed(6).toString();
+        }
+    } catch (e) {
+        currentExpression = 'Error';
+    }
+    updateResult();
+}
