@@ -1354,6 +1354,57 @@ function clearHistory() {
   localStorage.removeItem("calcHistory");
   renderHistory();
 }
+function solveSimultaneous() {
+
+    let input = document.getElementById("result").value.trim();
+
+    if (!input || input === "0") {
+        alert("Enter: a1,b1,c1,a2,b2,c2");
+        return;
+    }
+
+    // Remove ALL spaces
+    input = input.replace(/\s/g, "");
+
+    let values = input.split(",");
+
+    if (values.length !== 6) {
+        alert("Wrong format.\nUse exactly:\n2,3,13,4,1,11");
+        return;
+    }
+
+    let nums = values.map(v => parseFloat(v));
+
+    if (nums.some(isNaN)) {
+        alert("Invalid numbers.");
+        return;
+    }
+
+    let [a1, b1, c1, a2, b2, c2] = nums;
+
+    let D = (a1 * b2) - (a2 * b1);
+
+    if (D === 0) {
+        document.getElementById("result").value = "No unique solution";
+        left = "";
+        operator = "";
+        right = "";
+        return;
+    }
+
+    let Dx = (c1 * b2) - (c2 * b1);
+    let Dy = (a1 * c2) - (a2 * c1);
+
+    let x = Dx / D;
+    let y = Dy / D;
+
+    document.getElementById("result").value = "x=" + x + ", y=" + y;
+
+    left = "";
+    operator = "";
+    right = "";
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const scrollBtn = document.getElementById("scroll-to-calculator");
   if (scrollBtn) {
