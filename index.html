@@ -696,9 +696,18 @@ border-radius:15px;">
                     <!--  Row 7                  -->
                     <button class="btn btn-action" onclick="factorPrimeCheck()"
                       stylex="grid-column: span 2;">Factors</button>
+  
+                    <!-- Row 7 - Permutation & Combination -->
+                    <button class="btn btn-special" onclick="calculatePermutation()" title="Permutation: nPr = n!/(n-r)!">nPr</button>
+                    <button class="btn btn-special" onclick="calculateCombination()" title="Combination: nCr = n!/r!(n-r)!">nCr</button>
+                    <button class="btn btn-special" onclick="calculateFactorial()" title="Factorial: n!">n!</button>
                     <button class="btn btn-action" onclick="applyLogarithm()">
                       log
                     </button>
+
+                    <!--  Row 8                  -->
+                    <button class="btn btn-action" onclick="factorPrimeCheck()"
+                      stylex="grid-column: span 2;">Factors</button>
                     <button class="btn btn-special" onclick="tenPower()">10<sup>x</sup></button>
                     <button id="voice-input-btn" class="btn btn-special" aria-label="Speak calculation input"
                       onclick="startVoiceInput()">
