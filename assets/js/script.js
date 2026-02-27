@@ -1442,11 +1442,12 @@ function numberToHausa(num) {
 
   return result.trim();
 }
+
 // translate to hausas
 function translateToHausa() {
-  if (!left || operator || right) return;
+  if (!currentExpression) return;
 
-  const hausa = numberToHausa(left);
+  const hausa = numberToHausa(currentExpression);
   const wordResult = document.getElementById("word-result");
 
   wordResult.innerHTML =
@@ -1519,13 +1520,13 @@ function enableSpeakButton() {
 }
 
 function backToEnglish() {
-  if (!left || operator || right) return;
+  if (!currentExpression) return;
 
   const wordResult = document.getElementById("word-result");
 
   wordResult.innerHTML =
     '<span class="small-label">Result in words</span><strong>' +
-    numberToWords(left) +
+    numberToWords(currentExpression) +
     "</strong>";
 }
 
@@ -2558,9 +2559,9 @@ function numberToPortuguese(num) {
 }
 
 function translateToPortuguese() {
-  if (!left || operator || right) return;
+  if (!currentExpression) return;
 
-  const portuguese = numberToPortuguese(left);
+  const portuguese = numberToPortuguese(currentExpression);
   const wordResult = document.getElementById("word-result");
 
   wordResult.innerHTML =
