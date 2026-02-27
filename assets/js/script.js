@@ -475,8 +475,8 @@ function calculateResult() {
       calculateCombination();
       return;
     }
-
-    let result = eval(currentExpression);
+    let normalizedExpression = normalizeExpression(currentExpression);
+    let result = eval(normalizedExpression);
 
     if (isNaN(result) || !isFinite(result)) {
       throw new Error();
@@ -636,7 +636,6 @@ function toggleInverseMode() {
   document.getElementById("tan-btn").textContent = inverseMode
     ? "tan⁻¹"
     : "tan";
-  document.getElementById("inv-btn").classList.toggle("active", inverseMode);
 }
 
 function sinDeg(x) {
@@ -683,12 +682,11 @@ function normalizeExpression(expr) {
 }
 
 function isPrime(num) {
-  // Numbers less than 2 are not prime
-  if (num <= 1) {
-    return false;
+  if (num <= 1) return false;
+  for (let i = 2; i <= Math.sqrt(num); i++) {
+    if (num % i === 0) return false;
   }
-
-  return result;
+  return true;
 }
 
 function Parser(tokens) {
@@ -2417,3 +2415,40 @@ function updateAnswerPreview() {
     previewEl.textContent = "";
   }
 }
+document.addEventListener('keydown', function(event) {
+  const key = event.key;
+
+  if (!isNaN(key)) { // Check if the key is a number
+      appendToResult(key);
+  } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+      operatorToResult(key);
+  } else if (key === 'Enter') {
+      calculateResult();
+  } else if (key === 'Backspace') {
+      backspace();
+  } else if (key === 'Escape') {
+      clearResult();
+  } else if (key === '(' || key === ')') {
+      bracketToResult(key);
+  } else if (key === '.') {
+      appendToResult(key);
+  }else if (key === 's') {
+      trigButtonPressed('sin');
+  } else if (key === 'c') {
+      trigButtonPressed('cos');
+  } else if (key === 't') {
+      trigButtonPressed('tan');
+  }
+  else if (key === 'i') {
+      toggleInverseMode();
+  }
+  else if (key === 'A') {
+      trigButtonPressed('sin');
+  }
+  else if (key === 'C') {
+      trigButtonPressed('cos');
+  }
+  else if (key === 'T') {
+      trigButtonPressed('tan');
+  }
+});
